@@ -122,7 +122,17 @@
 .official-footer-brand .brand-text{display:flex!important;flex-direction:column!important;line-height:1.05!important}
 .official-footer-brand .brand-text strong{font-size:21px!important;font-weight:900!important;color:#10253b!important}
 .official-footer-brand .brand-text small{font-size:10px!important;color:#617183!important;margin-top:3px!important}
-</style>
+</style><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+const SUPABASE_URL = "https://hmiyagdzztfkgoislrp.supabase.co";
+const SUPABASE_KEY = "sb_publishable_7YMTqzau4JyVGm2u_NI8mQ__PZc1DU8";
+
+const supabaseClient = supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
+</script>
 </head>
 <body>
 <header><a class="official-brand" href="#" aria-label="VetPerto - início">
