@@ -427,7 +427,7 @@ function renderResults() {
   document.getElementById("needBadge").textContent = need === "urgencia" ? "URGÊNCIA" : need === "consulta" ? "CONSULTA" : "ESPECIALIDADE";
   document.getElementById("needBadge").className = "status " + (need === "urgencia" ? "urgent" : "open");
   document.getElementById("resultText").textContent = `Resultados para ${selectedAnimal} em ${loc}. Priorizamos disponibilidade e urgência quando aplicável.`;
-  let list = need === "urgencia" ? Vets.filter(v=>v.urgent).concat(Vets.filter(v=>!v.urgent)) : Vets;
+  let list = need === "urgencia" ? vets.filter(v=>v.urgent).concat(vets.filter(v=>!v.urgent)) : vets;
   const q = loc.toLowerCase().trim();
   if(q && q !== "a sua localização" && q !== "a minha localização"){
     const terms=q.split(",").map(x=>x.trim()).filter(Boolean);
