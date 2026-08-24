@@ -284,7 +284,8 @@ const demoVets = [{"name": "Centro Veterinário Gondomar - Clínica Veterinária
 
 
 
-const weeklyHours = {
+
+  const weeklyHours = {
   "AniCura CHV Porto Hospital Veterinário": {always:true},
   "Hospital Veterinário do Porto": {always:true},
   "Hospital Veterinário da Universidade do Porto - UPVet": {always:true},
@@ -383,7 +384,42 @@ function ratingHTML(name){
   return r[0] ? `<div class="rating"><span class="stars">${stars}</span><strong>${r[0].toFixed(1)}/5</strong><span class="reviews-count">(${r[1]} avaliações)</span></div>` : `<div class="rating"><span class="reviews-count">Ainda sem avaliações VetPerto</span></div>`;
 }
 
-let selectedAnimal = "Cão";
+let vets = [];
+
+async function loadVets() {
+    const { data, error } = await supabaseClient
+        .from("camv")
+        .select("*")
+        .eq("ativa", true);
+
+    if (error) {
+        console.error("Erro ao carregar clínicas:", error);
+        return;
+    }
+
+    vets = (data || []).map(v => ({
+        ...v,
+        name: v.nome,
+        type: v.tipo || "Clínica veterinária",
+        status: v.urgencia_24h ? "Urgência 24h" : "Horário regular",
+        statusClass: v.urgencia_24h ? "open" : "",
+        distance: null,
+        time: v.urgencia_24h ? "24h" : (v.horario || "Por confirmar"),
+        address: [
+            v.morada,
+            v.codigo_postal,
+            v.localidade
+        ].filter(Boolean).join(", "),
+        phone: v.telefone || "",
+        species: Array.isArray(v.especies) ? v.especies.join(", ") : "",
+        services: Array.isArray(v.servicos) ? v.servicos.join(", ") : "",
+        urgent: Boolean(v.urgencia_24h),
+        source: v.fonte_dados || "CAMV"
+    }));
+
+    console.log("Clínicas carregadas do Supabase:", vets.length);
+}
+  let selectedAnimal = "Cão";
 
 function renderResults() {
   const need = document.getElementById("need").value;
@@ -391,7 +427,7 @@ function renderResults() {
   document.getElementById("needBadge").textContent = need === "urgencia" ? "URGÊNCIA" : need === "consulta" ? "CONSULTA" : "ESPECIALIDADE";
   document.getElementById("needBadge").className = "status " + (need === "urgencia" ? "urgent" : "open");
   document.getElementById("resultText").textContent = `Resultados para ${selectedAnimal} em ${loc}. Priorizamos disponibilidade e urgência quando aplicável.`;
-  let list = need === "urgencia" ? demoVets.filter(v=>v.urgent).concat(demoVets.filter(v=>!v.urgent)) : demoVets;
+  let list = need === "urgencia" ? Vets.filter(v=>v.urgent).concat(Vets.filter(v=>!v.urgent)) : Vets;
   const q = loc.toLowerCase().trim();
   if(q && q !== "a sua localização" && q !== "a minha localização"){
     const terms=q.split(",").map(x=>x.trim()).filter(Boolean);
@@ -566,7 +602,7 @@ function openModal(type){
 }
 function closeModal(){document.getElementById("modal").classList.remove("show")}
 document.getElementById("modal").addEventListener("click",e=>{if(e.target.id==="modal")closeModal()});
-renderResults();
+loadVets();
 </script>
 <div style="max-width:1100px;margin:0 auto 30px;padding:0 18px;color:#657684;font-size:12px">A base nacional de CAMV é construída a partir do registo oficial da DGAV e enriquecida progressivamente. Dados de horários, urgências e contactos só são publicados como confirmados quando validados.</div></body>
 </html>
